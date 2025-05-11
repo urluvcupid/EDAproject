@@ -1,0 +1,241 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /product/{category_slug}/{product_slug}/:
+    get:
+      operationId: root_list
+      parameters:
+      - in: path
+        name: category_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortProductItem'
+          description: ''
+  /product/{category_slug}/{product_slug}/{item_slug}:
+    get:
+      operationId: root_retrieve
+      parameters:
+      - in: path
+        name: category_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: item_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullProductItem'
+          description: ''
+  /product/{slug}/:
+    get:
+      operationId: root_retrieve_2
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /product/catalogue/:
+    get:
+      operationId: catalogue_list
+      parameters:
+      - in: query
+        name: display
+        schema:
+          type: string
+      - in: query
+        name: pfilter
+        schema:
+          type: string
+      - in: query
+        name: price
+        schema:
+          type: number
+          format: float
+      - in: query
+        name: price__range
+        schema:
+          type: array
+          items:
+            type: number
+            format: float
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: storage
+        schema:
+          type: string
+      tags:
+      - catalogue
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductItem'
+          description: ''
+components:
+  schemas:
+    FullProductItem:
+      type: object
+      properties:
+        product_id:
+          type: integer
+        name:
+          type: string
+          nullable: true
+          maxLength: 100
+        color:
+          type: string
+          nullable: true
+          maxLength: 50
+        weight:
+          type: string
+          nullable: true
+          maxLength: 7
+        configuration:
+          type: string
+          readOnly: true
+        price:
+          type: number
+          format: double
+        discount:
+          type: integer
+          maximum: 65535
+          minimum: 0
+        availability:
+          type: integer
+          maximum: 65535
+          minimum: 0
+        attributes:
+          type: string
+          readOnly: true
+        specification:
+          nullable: true
+      required:
+      - attributes
+      - configuration
+      - price
+      - product_id
+    ProductItem:
+      type: object
+      properties:
+        product_id:
+          type: integer
+        name:
+          type: string
+          nullable: true
+          maxLength: 100
+        color:
+          type: string
+          nullable: true
+          maxLength: 50
+        configuration:
+          type: string
+          readOnly: true
+        price:
+          type: number
+          format: double
+        discount:
+          type: integer
+          maximum: 65535
+          minimum: 0
+        availability:
+          type: integer
+          maximum: 65535
+          minimum: 0
+      required:
+      - configuration
+      - price
+      - product_id
+    ShortProductItem:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          maxLength: 100
+        color:
+          type: string
+          nullable: true
+          maxLength: 50
+        configuration:
+          type: string
+          readOnly: true
+        price:
+          type: number
+          format: double
+        discount:
+          type: integer
+          maximum: 65535
+          minimum: 0
+        availability:
+          type: integer
+          maximum: 65535
+          minimum: 0
+      required:
+      - configuration
+      - price
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
